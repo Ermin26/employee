@@ -224,7 +224,7 @@ app.get('/logMeOut', (req, res, next) => {
             return next(err);
         } else {
             req.flash('success', 'Logged out.');
-            res.redirect('/employee');
+            res.redirect('/');
         }
     });
 });
