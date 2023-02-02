@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/userCheck.css">
     <title>
 
-        <%= newUser %>
+        <%= currentUser.username %>
 
     </title>
 </head>
@@ -20,7 +20,7 @@
     <nav id="navbar" class="navbar navbar-dark navbar-expand-md bg-dark text-light mb-2">
         <div class="container-fluid">
             <a class="navbar-brand border-bottom border-3 rounded-bottom border-light" href="#">
-                <%= newUser %>
+                <%= currentUser.username %>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,13 +42,13 @@
     </nav>
 
     <div class="container text-center mt-3">
-        <%# include('../../flashError') %>
+        <%- include('../flashError') %>
         <div class="row">
-            <% if(!findedEmployee.length) {%>
+            <% if(findedEmployee) {%>
             <div class="col ms-auto me-auto">
                     <div class="info text-center bg-success mt-1 mb-3 p-3">
                         <h1 class="text-center text-light">
-                            <%= newUser %>
+                            <%= currentUser.username %> <%= currentUser.lastname %>
                         </h1>
                         <h3 class="text-center bg-success text-light">Vsi računi so plačani!</h3>
                     </div>
@@ -57,7 +57,7 @@
                         <div class="col ms-auto me-auto">
                             <div class="info text-center text-light bg-danger mb-3 mt-1 ms-auto me-auto">
                                 <h1 id="forPay" class="text-center">
-                                    <%= newUser %>
+                                    <%= currentUser.username %> <%= currentUser.lastname %>
                                 </h1>
                                 <h3 class="text-center">Računi za plačilo</h3>
                             </div>
@@ -180,6 +180,7 @@
                     </h2>
                 </caption>
             </div>
+            
             <div id="planiran" class="row">
                 <table id="planiranDopust" class="table ms-auto me-auto mt-4 align-items-center">
                     <thead id="planiranHead">

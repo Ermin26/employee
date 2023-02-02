@@ -17,8 +17,9 @@ const LocalStrategy = require('passport-local');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const mongoSanitize = require('express-mongo-sanitize');
 const cookieParser = require('cookie-parser')
-const Employers = require('./models/employees')
-//const { loged } = require('./midleware/checkEmployeLogin');
+const Employers = require('./models/employees');
+const User = require('./models/models')
+const { isLoged } = require('./midleware/loged');
 
 const Vacation = require('./models/vacation');
 
@@ -91,24 +92,17 @@ app.use((req, res, next) => {
     next();
 })
 
+let todayDate = new Date();
+let date = todayDate.toLocaleDateString()
+let year = todayDate.getFullYear()
+
 app.get('/employee', async (req, res) => {
     res.render('employeeLogin');
 })
 
-let employeeData = []
-let userID = []
-app.get('/employee/myData', async (req, res) => {
-    let findedUser = []
-    let employee = employeeData[0]
-    //console.log(req)
-    console.log("||||||||||||||||||||||||||||||")
-    console.log(req.user)
-    console.log("||||||||||||||||||||||||||||||")
-    //console.log(req._passport)
-    console.log("||||||||||||||||||||||||||||||")
-    //console.log(req._passport)
+app.get('/employee/myData',isLoged, async (req, res) => {
+    
     const employeeStatus = await Employers.find({ username: { $regex: `${req.user.username}`, $options: 'i' } });
-    console.log(employeeStatus)
     let status = ''
     for (status of employeeStatus) {
         status = status.status
@@ -116,18 +110,13 @@ app.get('/employee/myData', async (req, res) => {
     }
 
     if (status != 'active') {
-        req.flash('error', 'Employee not found or your account is not active anymore. Please contact admin if you think your status must be changed.')
+        req.flash('error', 'Your account is not active anymore. Please contact admin if you think your status must be changed.')
         res.redirect('/employee')
     } else {
         const findedEmployee = await User.find({ buyer: { $regex: `${req.user.username}`, $options: 'i' }, pay: 'false' })
         const holidayInfo = await Vacation.find({ user: { $regex: `${req.user.username}`, $options: 'i' } })
         const holiday = await Vacation.find({})
-
-        for (pending of holidayInfo) {
-            userID.pop();
-            userID.push(pending.id)
-        }
-        res.render('userCheckByHimself', { findedEmployee, newUser, holidayInfo, year, holiday })
+        res.render('userCheckByHimself', { findedEmployee, holidayInfo, year, holiday })
     }
 
     /*
@@ -154,13 +143,13 @@ app.get('/employee/myData', async (req, res) => {
         res.render('userCheckByHimself', { findedEmployee, newUser, holidayInfo, year, holiday })
     }
     */
-    res.send(req.user)
+   // res.send(req.user)
 
 })
 
 app.get('/employee/myData/:id', async (req, res) => {
     const { id } = req.params;
-    const userHoliday = await Vacation.find({ user: { $regex: `${employeeData}`, $options: 'i' } })
+    const userHoliday = await Vacation.find({ user: { $regex: `${req.user.username}`, $options: 'i' } })
     //const holiday = userHoliday.findById(id)
     for (vac of userHoliday) {
         for (holiday of vac.pendingHolidays) {
@@ -202,19 +191,13 @@ app.post('/employee/myData/delete/:id', async (req, res) => {
 
 })
 
-app.get('/employee/askForHolidays', async (req, res) => {
-    if (employeeData.length) {
-        const user = await Vacation.find({ user: { $regex: `${employeeData}`, $options: 'i' } });
+app.get('/employee/askForHolidays', isLoged, async (req, res) => {
+    
+        const user = await Vacation.find({ user: { $regex: `${req.user.username}`, $options: 'i' } });
         for (data of user) {
             let usersData = data
-            console.log(usersData.overtime)
-
-            res.render('askForHolidays', { employeeData, userID, usersData })
+            res.render('askForHolidays', {usersData })
         }
-    } else {
-        res.redirect('/employee')
-    }
-
 })
 app.post('/askForHoliday', async (req, res) => {
     const data = req.body;
@@ -230,21 +213,16 @@ app.post('/askForHoliday', async (req, res) => {
 })
 
 app.post('/employee/login', passport.authenticate('local', { failureFlash: true, failureRedirect: '/employee', keepSessionInfo: true }), async (req, res) => {
-
-    req.flash('success', 'Successfully loged', req.user.username)
-    console.log(passport.session())
-    let user = req.session.passport.user;
-    employeeData.pop();
-    employeeData.push(user)
-    res.redirect('/employee/myData');
+    const redirect = req.session.returnTo || '/employee/myData';
+    req.flash('success', 'Successfully loged', req.user.username, req.user.lastname)
+    delete req.session.returnTo;
+    res.redirect(redirect)
 })
 app.get('/logMeOut', (req, res, next) => {
     req.logout(function (err) {
         if (err) {
             return next(err);
         } else {
-            employeeData.pop();
-            userID.pop();
             req.flash('success', 'Logged out.');
             res.redirect('/employee');
         }
