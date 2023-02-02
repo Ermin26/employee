@@ -96,7 +96,7 @@ let todayDate = new Date();
 let date = todayDate.toLocaleDateString()
 let year = todayDate.getFullYear()
 
-app.get('/employee', async (req, res) => {
+app.get('/', async (req, res) => {
     res.render('employeeLogin');
 })
 
@@ -111,7 +111,7 @@ app.get('/employee/myData',isLoged, async (req, res) => {
 
     if (status != 'active') {
         req.flash('error', 'Your account is not active anymore. Please contact admin if you think your status must be changed.')
-        res.redirect('/employee')
+        res.redirect('/')
     } else {
         const findedEmployee = await User.find({ buyer: { $regex: `${req.user.username}`, $options: 'i' }, pay: 'false' })
         const holidayInfo = await Vacation.find({ user: { $regex: `${req.user.username}`, $options: 'i' } })
