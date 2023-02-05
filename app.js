@@ -100,8 +100,16 @@ app.get('/', async (req, res) => {
     res.render('employeeLogin');
 })
 
-app.get('/employee/myData',isLoged, async (req, res) => {
-    
+
+app.post('/employee/login', passport.authenticate('local', { failureFlash: true, failureRedirect: '/employee', keepSessionInfo: true }), async (req, res) => {
+    const redirect = req.session.returnTo || '/employee/myData';
+    req.flash('success', 'Successfully loged', req.user.username, req.user.lastname)
+    delete req.session.returnTo;
+    res.redirect(redirect)
+})
+
+app.get('/employee/myData', isLoged, async (req, res) => {
+
     const employeeStatus = await Employers.find({ username: { $regex: `${req.user.username}`, $options: 'i' } });
     let status = ''
     for (status of employeeStatus) {
@@ -143,8 +151,29 @@ app.get('/employee/myData',isLoged, async (req, res) => {
         res.render('userCheckByHimself', { findedEmployee, newUser, holidayInfo, year, holiday })
     }
     */
-   // res.send(req.user)
+    // res.send(req.user)
 
+})
+
+app.get('/employee/askForHolidays', isLoged, async (req, res) => {
+
+    const user = await Vacation.find({ user: { $regex: `${req.user.username}`, $options: 'i' } });
+    for (data of user) {
+        let usersData = data
+        res.render('askForHolidays', { usersData })
+    }
+})
+
+app.post('/askForHoliday', async (req, res) => {
+    const data = req.body;
+    const dateStart = data.startDate.split('-').reverse().join('.');
+    const dateEnd = data.endDate.split('-').reverse().join('.');
+    const user = await Vacation.findById(data.userid);
+    const applyDate = date.split('-').reverse().join('.');
+    user.pendingHolidays.push({ startDate: `${dateStart}`, endDate: `${dateEnd}`, days: `${data.days}`, status: `${data.status}`, applyDate: `${applyDate}` });
+    await user.save();
+    req.flash('success', 'Vloga za dopust je odana.')
+    res.redirect('/employee/myData')
 })
 
 app.get('/employee/myData/:id', async (req, res) => {
@@ -168,9 +197,10 @@ app.put('/employee/myData/:id', async (req, res) => {
     const dateStart = vac.startDate.split('-').reverse().join('.');
     const dateEnd = vac.endDate.split('-').reverse().join('.');
     const updateHoliday = await Vacation.findById(id)
+    const applyDate = date.split('-').reverse().join('.');
     await updateHoliday.pendingHolidays.pop();
     await updateHoliday.save();
-    await updateHoliday.pendingHolidays.push({ startDate: `${dateStart}`, endDate: `${dateEnd}`, days: `${vac.days}`, status: `${vac.status}` });
+    await updateHoliday.pendingHolidays.push({ startDate: `${dateStart}`, endDate: `${dateEnd}`, days: `${vac.days}`, status: `${vac.status}`, applyDate: `${applyDate}` });
     await updateHoliday.save();
     req.flash('success', 'Vloga za dopust je posodobljena.')
     res.redirect('/employee/myData')
@@ -191,33 +221,6 @@ app.post('/employee/myData/delete/:id', async (req, res) => {
 
 })
 
-app.get('/employee/askForHolidays', isLoged, async (req, res) => {
-    
-        const user = await Vacation.find({ user: { $regex: `${req.user.username}`, $options: 'i' } });
-        for (data of user) {
-            let usersData = data
-            res.render('askForHolidays', {usersData })
-        }
-})
-app.post('/askForHoliday', async (req, res) => {
-    const data = req.body;
-    let startDate = data.startDate;
-    const dateStart = startDate.split('-').reverse().join('.');
-    const dateEnd = data.endDate.split('-').reverse().join('.');
-    const user = await Vacation.findById(data.userid);
-    const applyDate = date;
-    user.pendingHolidays.push({ startDate: `${dateStart}`, endDate: `${dateEnd}`, days: `${data.days}`, status: `${data.status}`, applyDate: `${applyDate}` });
-    await user.save();
-    req.flash('success', 'Vloga za dopust je odana.')
-    res.redirect('/employee/myData')
-})
-
-app.post('/employee/login', passport.authenticate('local', { failureFlash: true, failureRedirect: '/employee', keepSessionInfo: true }), async (req, res) => {
-    const redirect = req.session.returnTo || '/employee/myData';
-    req.flash('success', 'Successfully loged', req.user.username, req.user.lastname)
-    delete req.session.returnTo;
-    res.redirect(redirect)
-})
 app.get('/logMeOut', (req, res, next) => {
     req.logout(function (err) {
         if (err) {
