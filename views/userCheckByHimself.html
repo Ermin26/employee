@@ -43,21 +43,23 @@
 
     <div class="container text-center mt-3">
         <%- include('../flashError') %>
-        <div class="row">
-            <% if(findedEmployee) {%>
-            <div class="col ms-auto me-auto">
-                    <div class="info text-center bg-success mt-1 mb-3 p-3">
-                        <h1 class="text-center text-light">
-                            <%= currentUser.username %> <%= currentUser.lastname %>
-                        </h1>
-                        <h3 class="text-center bg-success text-light">Vsi računi so plačani!</h3>
-                    </div>
+            <div class="row">
+                <% if(findedEmployee) {%>
+                    <div class="col ms-auto me-auto">
+                        <div class="info text-center bg-success mt-1 mb-3 p-3">
+                            <h1 class="text-center text-light">
+                                <%= currentUser.username %>
+                                    <%= currentUser.lastname %>
+                            </h1>
+                            <h3 class="text-center bg-success text-light">Vsi računi so plačani!</h3>
+                        </div>
                     </div>
                     <% }else { %>
                         <div class="col ms-auto me-auto">
                             <div class="info text-center text-light bg-danger mb-3 mt-1 ms-auto me-auto">
                                 <h1 id="forPay" class="text-center">
-                                    <%= currentUser.username %> <%= currentUser.lastname %>
+                                    <%= currentUser.username %>
+                                        <%= currentUser.lastname %>
                                 </h1>
                                 <h3 class="text-center">Računi za plačilo</h3>
                             </div>
@@ -65,181 +67,219 @@
 
                         <div class="row">
                             <div id="table">
-                            <div class="table-info">
-                                <table id="table-data" class="table table-dark table-hover mt-3 text-center">
-                                    <thead id="thead-data">
-                                        <th class="col">Izdelek</th>
-                                        <th class="col">Količina</th>
-                                        <th class="col">Cena</th>
-                                        <th class="col">Mesec</th>
-                                        <th class="col">Teden</th>
-                                        <th class="col">Plačano</th>
-                                        <th class="col">Datum izdaje</th>
-                                        <th class="col">Izdal</th>
+                                <div class="table-info">
+                                    <table id="table-data" class="table table-dark table-hover mt-3 text-center">
+                                        <thead id="thead-data">
+                                            <th class="col">Izdelek</th>
+                                            <th class="col">Količina</th>
+                                            <th class="col">Cena</th>
+                                            <th class="col">Mesec</th>
+                                            <th class="col">Teden</th>
+                                            <th class="col">Plačano</th>
+                                            <th class="col">Datum izdaje</th>
+                                            <th class="col">Izdal</th>
 
-                                    </thead>
-                                    <tbody>
-                                        <% for(let user of findedEmployee) {%>
-                                            <% for(let product of user.products) {%>
-                                                <tr>
-                                                    <td>
-                                                        <%= product.name %>
-                                                    </td>
-                                                    <td>
-                                                        <%= product.qty %>
-                                                    </td>
-                                                    <td>
-                                                        <%= product.total %>
-                                                    </td>
+                                        </thead>
+                                        <tbody>
+                                            <% for(let user of findedEmployee) {%>
+                                                <% for(let product of user.products) {%>
+                                                    <tr>
+                                                        <td>
+                                                            <%= product.name %>
+                                                        </td>
+                                                        <td>
+                                                            <%= product.qty %>
+                                                        </td>
+                                                        <td>
+                                                            <%= product.total %>
+                                                        </td>
 
-                                                    <td>
-                                                        <%= user.month %>
-                                                    </td>
-                                                    <td>
-                                                        <%= user.kt %>
-                                                    </td>
-                                                    <td>
-                                                        <img src="../notPay.jpg" alt="Not Payed">
-                                                    </td>
-                                                    <td>
-                                                        <%= user.soldDate %>
-                                                    </td>
-                                                    <td>
-                                                        <%= user.izdal %>
-                                                    </td>
-                                                </tr>
-                                                <% } %>
+                                                        <td>
+                                                            <%= user.month %>
+                                                        </td>
+                                                        <td>
+                                                            <%= user.kt %>
+                                                        </td>
+                                                        <td>
+                                                            <img src="../notPay.jpg" alt="Not Payed">
+                                                        </td>
+                                                        <td>
+                                                            <%= user.soldDate %>
+                                                        </td>
+                                                        <td>
+                                                            <%= user.izdal %>
+                                                        </td>
+                                                    </tr>
                                                     <% } %>
-                                                        <tr class="bg-danger">
-                                                            <td>Za Plačat</td>
-                                                            <td></td>
-                                                            <td id="total"></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                                                        <% } %>
+                                                            <tr class="bg-danger">
+                                                                <td>Za Plačat</td>
+                                                                <td></td>
+                                                                <td id="total"></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                         <% } %>
-        </div>
-
-            <div class="row">
-            <div class="col ms-auto me-auto mt-5 mb-5">
-                <caption class="mb-2">
-                    <h2 class="mb-3 p-2">
-                        Stanje letnega dopusta in ur za leto <%= year %>
-                    </h2>
-                </caption>
-            </div>
-            <div id="stanje" class="row">
-                <table id="stanjeLetnegaDopusta" class="table table-info mt-2 mb-5">
-                    <thead id="stanjeHead">
-                        <th>Lanski dopust</th>
-                        <th>Letni dopust</th>
-                        <th>Skupaj za tekoče leto</th>
-                        <th>Koriščeno</th>
-                        <th>Preostalo</th>
-                        <th>Ure</th>
-                        <th>Koriščeno</th>
-                        <th>Preostale ure</th>
-                    </thead>
-                    <tbody>
-                        <% for(user of holidayInfo) {%>
-                            <tr>
-                                <td id="lanskiDopust">
-                                    <%= user.lastYearHolidays %>
-                                </td>
-                                <td id="letniDopust">
-                                    <%= user.holidays %>
-                                </td>
-                                <td id="skupaj"></td>
-                                <td id="korisceno">
-                                    <%= user.usedHolidays %>
-                                </td>
-                                <td id="preostalo"></td>
-                                <td id="ure">
-                                    <%= user.overtime %>
-                                </td>
-                                <td id="korisceneUre">0</td>
-                                <td id="preostaleUre"></td>
-                                <% } %>
-                            </tr>
-                    </tbody>
-                </table>
             </div>
 
             <div class="row">
-                <caption class="mb-2 mt-2">
-                    <h2 class="mb-3">
-                        Planiran dopust za leto <%= year %>
-                    </h2>
-                </caption>
-            </div>
-            
-            <div id="planiran" class="row">
-                <table id="planiranDopust" class="table ms-auto me-auto mt-4 align-items-center">
-                    <thead id="planiranHead">
-                        <th>Prvi dan dopusta</th>
-                        <th>Zadnji dan dopusta</th>
-                        <th>Dni</th>
-                        <th>Status</th>
-                        <th>Datum</th>
-                        <th>Uredi</th>
-                        <th>Izbriši</th>
-                    </thead>
-                    <% for(info of holidayInfo) {%>
-                        <% for(userInfo of info.pendingHolidays) {%>
-                            <tr id="myRow" class="">
-                                <td>
-                                    <%= userInfo.startDate%>
-                                </td>
-                                <td>
-                                    <%= userInfo.endDate%>
-                                </td>
-                                <td>
-                                    <%= userInfo.days%>
-                                </td>
-                                <td id="status" class="">
-                                    <%= userInfo.status%>
-                                </td>
-                                <td>
-                                    <%= userInfo.applyDate%>
-                                </td>
-                                <% if(userInfo.status=='Pending' ) {%>
-                                    <td>
-                                        <a href="/employee/myData/<%= userInfo.id%> "><button
-                                                class="btn btn-warning btn-sm">Uredi</button></a>
-
+                <div class="col ms-auto me-auto mt-5 mb-5">
+                    <caption class="mb-2">
+                        <h2 class="mb-3 p-2">
+                            Stanje letnega dopusta in ur za leto <%= year %>
+                        </h2>
+                    </caption>
+                </div>
+                <div id="stanje" class="row">
+                    <table id="stanjeLetnegaDopusta" class="table table-info mt-2 mb-5">
+                        <thead id="stanjeHead">
+                            <th>Lanski dopust</th>
+                            <th>Letni dopust</th>
+                            <th>Skupaj za tekoče leto</th>
+                            <th>Koriščeno</th>
+                            <th>Preostalo</th>
+                            <th>Ure</th>
+                            <th>Koriščeno</th>
+                            <th>Preostale ure</th>
+                        </thead>
+                        <tbody>
+                            <% for(user of holidayInfo) {%>
+                                <tr>
+                                    <td id="lanskiDopust">
+                                        <strong>
+                                            <%= user.lastYearHolidays %>
+                                        </strong>
                                     </td>
-                                    <td>
-                                        <form class="d-inline ms-auto me-auto"
-                                            action="/employee/myData/delete/<%= user.id%>" method="post">
-                                            <input type="text" name="deleteVacId" id="deleteVacId" hidden
-                                                value="<%= userInfo.id%>">
-                                            <button class="btn btn-danger btn-sm">Izbriši</button>
-                                        </form>
+                                    <td id="letniDopust">
+                                        <strong>
+                                            <%= user.holidays %>
+                                        </strong>
+                                    </td>
+                                    <td><strong id="skupaj">
+
+                                        </strong>
                                     </td>
 
-                                    <% }else{ %>
-                                        <td>
-                                            <a href="#"><button class="btn btn-secondary btn-sm">Neaktivno</button></a>
+                                    <td>
+                                        <strong id="korisceno">
+                                            <%= user.usedHolidays %>
+                                        </strong>
+                                    </td>
+                                    <td><strong id="preostalo">
 
+                                        </strong>
+                                    </td>
+
+                                    <td>
+                                        <strong id="ure">
+
+                                            <%= user.overtime %>
+                                        </strong>
+                                    </td>
+                                    <td>
+                                        <strong id="korisceneUre">
+                                            0
+                                        </strong>
+                                    </td>
+                                    <td>
+                                        <strong id="preostaleUre">
+
+                                        </strong>
+                                    </td>
+                                    <% } %>
+                                </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="row">
+                    <caption class="mb-2 mt-2">
+                        <h2 class="mb-3">
+                            Planiran dopust za leto <%= year %>
+                        </h2>
+                    </caption>
+                </div>
+
+                <div id="planiran" class="row">
+                    <table id="planiranDopust" class="table ms-auto me-auto mt-4 align-items-center">
+                        <thead id="planiranHead">
+                            <th>Prvi dan dopusta</th>
+                            <th>Zadnji dan dopusta</th>
+                            <th>Dni</th>
+                            <th>Status</th>
+                            <th>Datum</th>
+                            <th>Uredi</th>
+                            <th>Izbriši</th>
+                        </thead>
+                        <% for(info of holidayInfo) {%>
+                            <% for(userInfo of info.pendingHolidays) {%>
+                                <tr id="myRow" class="">
+                                    <td>
+                                        <strong>
+                                            <%= userInfo.startDate%>
+                                        </strong>
+                                    </td>
+                                    <td>
+                                        <strong>
+                                            <%= userInfo.endDate%>
+                                        </strong>
+                                    </td>
+                                    <td>
+                                        <strong>
+                                            <%= userInfo.days%>
+                                        </strong>
+                                    </td>
+                                    <td id="status" class="">
+                                        <strong>
+                                            <%= userInfo.status%>
+                                        </strong>
+                                    </td>
+                                    <td>
+                                        <strong>
+                                            <%= userInfo.applyDate%>
+                                        </strong>
+                                    </td>
+                                    <% if(userInfo.status=='Pending' ) {%>
+                                        <td>
+                                            <strong>
+                                                <a href="/employee/myData/<%= userInfo.id%> "><button
+                                                        class="btn btn-warning btn-sm">Uredi</button></a>
+                                            </strong>
                                         </td>
                                         <td>
-                                            <button class="btn btn-secondary btn-sm">Neaktivno</button>
+                                            <strong>
+                                                <form class="d-inline ms-auto me-auto"
+                                                    action="/employee/myData/delete/<%= user.id%>" method="post">
+                                                    <input type="text" name="deleteVacId" id="deleteVacId" hidden
+                                                        value="<%= userInfo.id%>">
+                                                    <button class="btn btn-danger btn-sm">Izbriši</button>
+                                                </form>
+                                            </strong>
 
                                         </td>
-                                        <% } %>
-                            </tr>
-                            <% } %>
+                                        <% }else{ %>
+                                            <td>
+                                                <a href="#"><button
+                                                        class="btn btn-secondary btn-sm">Neaktivno</button></a>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-secondary btn-sm">Neaktivno</button>
+
+                                            </td>
+                                            <% } %>
+                                </tr>
                                 <% } %>
-                </table>
-            </div>
+                                    <% } %>
+                    </table>
+                </div>
             </div>
     </div>
 

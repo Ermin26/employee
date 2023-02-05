@@ -101,7 +101,7 @@ app.get('/', async (req, res) => {
 })
 
 
-app.post('/employee/login', passport.authenticate('local', { failureFlash: true, failureRedirect: '/employee', keepSessionInfo: true }), async (req, res) => {
+app.post('/employee/login', passport.authenticate('local', { failureFlash: true, failureRedirect: '/', keepSessionInfo: true }), async (req, res) => {
     const redirect = req.session.returnTo || '/employee/myData';
     req.flash('success', 'Successfully loged', req.user.username, req.user.lastname)
     delete req.session.returnTo;
@@ -123,36 +123,8 @@ app.get('/employee/myData', isLoged, async (req, res) => {
     } else {
         const findedEmployee = await User.find({ buyer: { $regex: `${req.user.username}`, $options: 'i' }, pay: 'false' })
         const holidayInfo = await Vacation.find({ user: { $regex: `${req.user.username}`, $options: 'i' } })
-        const holiday = await Vacation.find({})
-        res.render('userCheckByHimself', { findedEmployee, holidayInfo, year, holiday })
+        res.render('userCheckByHimself', { findedEmployee, holidayInfo, year })
     }
-
-    /*
-    //const user = await User.find({ buyer: { $regex: `${employee}`, $options: 'i' } }).limit(1)
-
-
-    for (let username of user) {
-        findedUser.pop();
-        findedUser.push(username.buyer)
-    }
-    let newUser = findedUser[0];
-    if (!employee || status != 'active') {
-        req.flash('error', 'Employee not found or your account is not active anymore. Please contact admin if you think your status must be changed.')
-        res.redirect('/employee')
-    } else {
-        const findedEmployee = await User.find({ buyer: { $regex: `${employee}`, $options: 'i' }, pay: 'false' })
-        const holidayInfo = await Vacation.find({ user: { $regex: `${employee}`, $options: 'i' } })
-        const holiday = await Vacation.find({})
-
-        for (pending of holidayInfo) {
-            userID.pop();
-            userID.push(pending.id)
-        }
-        res.render('userCheckByHimself', { findedEmployee, newUser, holidayInfo, year, holiday })
-    }
-    */
-    // res.send(req.user)
-
 })
 
 app.get('/employee/askForHolidays', isLoged, async (req, res) => {
@@ -169,7 +141,7 @@ app.post('/askForHoliday', async (req, res) => {
     const dateStart = data.startDate.split('-').reverse().join('.');
     const dateEnd = data.endDate.split('-').reverse().join('.');
     const user = await Vacation.findById(data.userid);
-    const applyDate = date.split('-').reverse().join('.');
+    const applyDate = date;
     user.pendingHolidays.push({ startDate: `${dateStart}`, endDate: `${dateEnd}`, days: `${data.days}`, status: `${data.status}`, applyDate: `${applyDate}` });
     await user.save();
     req.flash('success', 'Vloga za dopust je odana.')

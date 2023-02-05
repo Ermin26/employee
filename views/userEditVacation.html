@@ -39,37 +39,38 @@
     <div class="container">
         <%# include('../../flashError') %>
 
-            <div class="holiday">
-                <h1>Izberi datum</h1>
-                <%# holiday.id %>
-                    <%= vac.id %> user id
+            <div class="holiday text-center">
+                <h1>Uredi dopust</h1>
             </div>
-            <div class="col mt-2 ms-auto me-auto">
-                <div class="holidayForm justify-content-center ms-auto me-auto">
-                    <form class="text-center ms-auto me-auto w-50" action="/employee/myData/<%= vac.id %>?_method=PUT"
-                        method="POST">
+            <div class="col mt-2 bg-info ms-auto me-auto">
+                <div class="holidayForm justify-content-center ms-auto me-auto mt-5">
+                    <form class="text-center ms-auto me-auto w-75 mt-5 mb-3"
+                        action="/employee/myData/<%= vac.id %>?_method=PUT" method="POST">
                         <input type="text" name="vacId" value="<%= holiday.id%>" hidden>
-                        <div class="mb-2 d-flex flex-column w-50 ms-auto me-auto">
-                            <label for="startDate">Prvi dan dopusta</label>
+                        <div class="col-lg-4 ms-auto me-auto mb-2 d-flex flex-column">
+                            <label for="startDate"> <strong> Začetek dopusta</strong></label>
                             <input type="date" class="text-center" name="startDate" id="startDate" required>
                         </div>
-                        <div class="mb-2 d-flex flex-column  w-50 ms-auto me-auto">
-                            <label for="endDate">Zadnji dan dopusta</label>
+                        <div class="col-lg-4 ms-auto me-auto mb-2 d-flex flex-column">
+                            <label for="endDate"> <strong> Konec dopusta</strong></label>
                             <input type="date" class=" text-center" name="endDate" id="endDate" required>
                         </div>
-                        <div class="mb-2 d-flex flex-column  w-50 ms-auto me-auto">
-                            <label for="days">Število dni</label>
-                            <input type="number" class="text-center" name="days" id="days" value="<%= holiday.days %>">
+                        <div class="col-lg-4 ms-auto me-auto mb-2 d-flex flex-column">
+                            <label for="days"> <strong> Število dni</strong></label>
+                            <input type="number" class="text-center" name="days" id="days" min="1"
+                                value="<%= holiday.days %>" required>
                         </div>
-                        <div class="mb-2 d-flex flex-column  w-50 ms-auto me-auto">
-                            <label for="status">Status</label>
+                        <div class="col-lg-4 ms-auto me-auto mb-2 d-flex flex-column">
+                            <label for="status"> <strong> Status</strong></label>
                             <input type="text" class="text-center" name="status" id="status" value="Pending" readonly>
                         </div>
                         <button class="btn btn-secondary mt-4 d-inline">Submit</button>
-                    </form>
                 </div>
 
+                </form>
             </div>
+
+    </div>
 
     </div>
 
