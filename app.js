@@ -19,6 +19,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const cookieParser = require('cookie-parser')
 const Employers = require('./models/employees');
 const User = require('./models/models')
+const Notifications = require('./models/notifications')
 const { isLoged } = require('./midleware/loged');
 
 const Vacation = require('./models/vacation');
@@ -109,7 +110,7 @@ app.post('/employee/login', passport.authenticate('local', { failureFlash: true,
 })
 
 app.get('/employee/myData', isLoged, async (req, res) => {
-
+    const data = await Notifications.find({});
     const employeeStatus = await Employers.find({ username: { $regex: `${req.user.username}`, $options: 'i' } });
     let status = ''
     for (status of employeeStatus) {
@@ -118,7 +119,7 @@ app.get('/employee/myData', isLoged, async (req, res) => {
     }
 
     if (status != 'active') {
-        req.flash('error', 'Your account is not active anymore. Please contact admin if you think your status must be changed.')
+        req.flash('error', 'Vaš profil nije aktiven! ')
         res.redirect('/')
     } else {
         const findedEmployee = await User.find({ buyer: { $regex: `${req.user.username}`, $options: 'i' }, pay: 'false' })
@@ -141,9 +142,11 @@ app.post('/askForHoliday', async (req, res) => {
     const dateStart = data.startDate.split('-').reverse().join('.');
     const dateEnd = data.endDate.split('-').reverse().join('.');
     const user = await Vacation.findById(data.userid);
+    const newNotification = await new Notifications({ _id: `${data.userid}`, username: `${user.user}`, days: `${data.days}` })
     const applyDate = date;
     user.pendingHolidays.push({ startDate: `${dateStart}`, endDate: `${dateEnd}`, days: `${data.days}`, status: `${data.status}`, applyDate: `${applyDate}` });
     await user.save();
+    await newNotification.save()
     req.flash('success', 'Vloga za dopust je odana.')
     res.redirect('/employee/myData')
 })
@@ -174,14 +177,18 @@ app.put('/employee/myData/:id', async (req, res) => {
     await updateHoliday.save();
     await updateHoliday.pendingHolidays.push({ startDate: `${dateStart}`, endDate: `${dateEnd}`, days: `${vac.days}`, status: `${vac.status}`, applyDate: `${applyDate}` });
     await updateHoliday.save();
+    const editedVac = await Notifications.findByIdAndUpdate(id, { username: `${updateHoliday.user}`, days: `${vac.days}` })
+    editedVac.save()
     req.flash('success', 'Vloga za dopust je posodobljena.')
     res.redirect('/employee/myData')
 })
+
 //? EMPLOYEE DELETE VACATION
 app.post('/employee/myData/delete/:id', async (req, res) => {
     const { id } = req.params;
     const deleteId = req.body.deleteVacId;
     const updateHoliday = await Vacation.findById(id)
+    const deleteNot = await Notifications.deleteOne({ _id: id })
     for (vacations of updateHoliday.pendingHolidays) {
         if (vacations.id == deleteId) {
             await updateHoliday.pendingHolidays.pop(vacations);
