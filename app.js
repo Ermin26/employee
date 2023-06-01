@@ -21,11 +21,12 @@ const Employers = require('./models/employees');
 const User = require('./models/models')
 const Notifications = require('./models/notifications')
 const { isLoged } = require('./midleware/loged');
+const nodemailer = require('nodemailer');
 
 const Vacation = require('./models/vacation');
 
 const db_URL = process.env.DB_URL
-
+const yoo = process.env.YOO
 mongoose.connect(db_URL);
 
 const db = mongoose.connection;
@@ -33,6 +34,7 @@ db.on("error", console.error.bind(console, "connection error"));
 db.once("open", () => {
     console.log("Database connection established");
 })
+
 
 
 app.use(express.urlencoded({ extended: true }));
@@ -147,6 +149,31 @@ app.post('/askForHoliday', async (req, res) => {
     user.pendingHolidays.push({ startDate: `${dateStart}`, endDate: `${dateEnd}`, days: `${data.days}`, status: `${data.status}`, applyDate: `${applyDate}` });
     await user.save();
     await newNotification.save()
+    let transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: "jolda.ermin@gmail.com",
+            pass: `${yoo}`,
+        },
+        tls: {
+            rejectUnauthorized: false,
+        }
+    });
+    
+    let mailOptions = {
+        from: "jolda.ermin@gmail.com",
+        to: "mb.providio@gmail.com",
+        subject: "DOPUST",
+        text: `Delavec ${user.user} je odal vlogo za dopust od ${dateStart} - ${dateEnd} dne - ${applyDate}.`,
+    };
+    
+    transporter.sendMail(mailOptions, function (err, success) {
+        if (err) {
+            console.log(err.message);
+        } else {
+            console.log("Email sended");
+        }
+    })
     req.flash('success', 'Vloga za dopust je odana.')
     res.redirect('/employee/myData')
 })
