@@ -126,6 +126,7 @@ app.get('/employee/myData', isLoged, async (req, res) => {
     } else {
         const findedEmployee = await User.find({ buyer: { $regex: `${req.user.username}`, $options: 'i' }, pay: 'false' })
         const holidayInfo = await Vacation.find({ user: { $regex: `${req.user.username}`, $options: 'i' } })
+       
         res.render('userCheckByHimself', { findedEmployee, holidayInfo, year })
     }
 })
@@ -145,36 +146,44 @@ app.post('/askForHoliday', async (req, res) => {
     const dateEnd = data.endDate.split('-').reverse().join('.');
     const user = await Vacation.findById(data.userid);
     try {
-        const newNotification = await new Notifications({ username: `${user.user}`, days: `${data.days}`, user_id: `${user.id}` })
-    const applyDate = date;
-    user.pendingHolidays.push({ startDate: `${dateStart}`, endDate: `${dateEnd}`, days: `${data.days}`, status: `${data.status}`, applyDate: `${applyDate}` });
-    await user.save();
-    await newNotification.save()
-    let transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: "jolda.ermin@gmail.com",
-            pass: `${yoo}`,
-        },
-        tls: {
-            rejectUnauthorized: false,
-        }
-    });
+        const applyDate = date;
+        user.pendingHolidays.push({ startDate: `${dateStart}`, endDate: `${dateEnd}`, days: `${data.days}`, status: `${data.status}`, applyDate: `${applyDate}` });
+        await user.save(async function (err, result) { 
+            if (err) {
+                req.flash('error', `Error: ${e.message}. Oddaja vloge za dopust ni uspela!`);
+                res.redirect('/employee/askForHolidays');
+            } else {
+                let transporter = nodemailer.createTransport({
+                    service: "gmail",
+                    auth: {
+                        user: "jolda.ermin@gmail.com",
+                        pass: `${yoo}`,
+                    },
+                    tls: {
+                        rejectUnauthorized: false,
+                    }
+                });
+                
+                let mailOptions = {
+                    from: "jolda.ermin@gmail.com",
+                    to: "mb.providio@gmail.com",
+                    subject: "DOPUST",
+                    text: `Delavec ${user.user} je odal vlogo za dopust od ${dateStart} - ${dateEnd} dne - ${applyDate}.`,
+                };
+                
+                transporter.sendMail(mailOptions, function (err, success) {
+                    if (err) {
+                        console.log(err.message);
+                    } else {
+                        console.log("Email sended");
+                    }
+                })
+                let holiday = result.pendingHolidays[result.pendingHolidays.length - 1];
+                const newNotification = await new Notifications({ username: `${user.user}`, days: `${data.days}`, user_id: `${user.id}`, vac_id: `${holiday._id}` })
+                await newNotification.save()
+            }
+        });
     
-    let mailOptions = {
-        from: "jolda.ermin@gmail.com",
-        to: "mb.providio@gmail.com",
-        subject: "DOPUST",
-        text: `Delavec ${user.user} je odal vlogo za dopust od ${dateStart} - ${dateEnd} dne - ${applyDate}.`,
-    };
-    
-    transporter.sendMail(mailOptions, function (err, success) {
-        if (err) {
-            console.log(err.message);
-        } else {
-            console.log("Email sended");
-        }
-    })
     req.flash('success', 'Vloga za dopust je odana.')
     res.redirect('/employee/myData')
     } catch (e) { 
@@ -202,17 +211,33 @@ app.get('/employee/myData/:id', async (req, res) => {
 app.put('/employee/myData/:id', async (req, res) => {
     const { id } = req.params;
     const vac = req.body;
+    //console.log(vac);
     const dateStart = vac.startDate.split('-').reverse().join('.');
     const dateEnd = vac.endDate.split('-').reverse().join('.');
     const updateHoliday = await Vacation.findById(id)
     const applyDate = date.split('-').reverse().join('.');
     try {
-        await updateHoliday.pendingHolidays.pop();
-        await updateHoliday.save();
-        await updateHoliday.pendingHolidays.push({ startDate: `${dateStart}`, endDate: `${dateEnd}`, days: `${vac.days}`, status: `${vac.status}`, applyDate: `${applyDate}` });
-        await updateHoliday.save();
-        const editedVac = await Notifications.updateOne({ user_id: `${id}` }, { $set: { days: `${vac.days}` } })
-        let transporter = nodemailer.createTransport({
+        
+        for (let i = 0; i < updateHoliday.pendingHolidays.length; i++) {
+            
+            if (vac.vacId === updateHoliday.pendingHolidays[i].id) {
+                
+                await updateHoliday.pendingHolidays[i].startDate.pop();
+                await updateHoliday.pendingHolidays[i].endDate.pop();
+                await updateHoliday.pendingHolidays[i].days.pop();
+                await updateHoliday.pendingHolidays[i].startDate.push(dateStart);
+                await updateHoliday.pendingHolidays[i].endDate.push(dateEnd);
+                await updateHoliday.pendingHolidays[i].days.push(vac.days);
+                //await updateHoliday.save();
+                //await updateHoliday.pendingHolidays.push({ startDate: `${dateStart}`, endDate: `${dateEnd}`, days: `${vac.days}`, status: `${vac.status}`, applyDate: `${applyDate}` });
+                await updateHoliday.save(async function (err, result) { 
+                if (err) {
+                    req.flash('error', `Error: ${err.message}`)
+                    res.redirect('/employee/myData')
+                }
+                else {
+                    const editedVac = await Notifications.updateOne({ user_id: `${id}`, vac_id: `${vac.vacId}` }, { $set: { days: `${vac.days}` } })
+                    let transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
                 user: "jolda.ermin@gmail.com",
@@ -221,25 +246,28 @@ app.put('/employee/myData/:id', async (req, res) => {
             tls: {
                 rejectUnauthorized: false,
             }
-        });
+                });
         
-        let mailOptions = {
+                let mailOptions = {
             from: "jolda.ermin@gmail.com",
             to: "mb.providio@gmail.com",
             subject: "EDIT DOPUST",
-            text: `Delavec ${user.user} je spremenil vlogo za dopust od ${dateStart} - ${dateEnd} dne - ${applyDate}.`,
-        };
+            text: `Delavec ${updateHoliday.user} je spremenil vlogo za dopust od ${dateStart} - ${dateEnd} dne - ${applyDate}.`,
+                };
         
-        transporter.sendMail(mailOptions, function (err, success) {
+                transporter.sendMail(mailOptions, function (err, success) {
             if (err) {
                 console.log(err.message);
             } else {
                 console.log("Email sended");
             }
-        })
-        req.flash('success', 'Vloga za dopust je posodobljena.')
-        res.redirect('/employee/myData')
-        
+                })
+                req.flash('success', 'Vloga za dopust je posodobljena.')
+                res.redirect('/employee/myData')
+                }
+            });
+            }
+        }
     } catch (err) { 
         req.flash('error', `Error: ${err.message}`)
         res.redirect('/employee/myData')
@@ -252,7 +280,7 @@ app.post('/employee/myData/delete/:id', async (req, res) => {
     const deleteId = req.body.deleteVacId;
     const updateHoliday = await Vacation.findById(id)
     try {
-        const deleteNot = await Notifications.deleteOne({ _id: id })
+        const deleteNot = await Notifications.deleteOne({ vac_id: deleteId })
     for (vacations of updateHoliday.pendingHolidays) {
         if (vacations.id == deleteId) {
             await updateHoliday.pendingHolidays.pop(vacations);
