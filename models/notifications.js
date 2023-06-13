@@ -4,8 +4,8 @@ const passportLocalMongoose = require('passport-local-mongoose');
 
 
 const NotificationsSchema = new Schema({
-    _id: Object,
     username: String,
+    user_id: String,
     days: Number,
     status: {
         type: String,

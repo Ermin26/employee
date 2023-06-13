@@ -144,7 +144,8 @@ app.post('/askForHoliday', async (req, res) => {
     const dateStart = data.startDate.split('-').reverse().join('.');
     const dateEnd = data.endDate.split('-').reverse().join('.');
     const user = await Vacation.findById(data.userid);
-    const newNotification = await new Notifications({ _id: `${data.userid}`, username: `${user.user}`, days: `${data.days}` })
+    try {
+        const newNotification = await new Notifications({ username: `${user.user}`, days: `${data.days}`, user_id: `${user.id}` })
     const applyDate = date;
     user.pendingHolidays.push({ startDate: `${dateStart}`, endDate: `${dateEnd}`, days: `${data.days}`, status: `${data.status}`, applyDate: `${applyDate}` });
     await user.save();
@@ -176,6 +177,11 @@ app.post('/askForHoliday', async (req, res) => {
     })
     req.flash('success', 'Vloga za dopust je odana.')
     res.redirect('/employee/myData')
+    } catch (e) { 
+        req.flash('error', `Error: ${e.message}. Oddaja vloge za dopust ni uspela!`);
+        res.redirect('/employee/askForHolidays');
+    }
+    
 })
 
 app.get('/employee/myData/:id', async (req, res) => {
@@ -200,14 +206,44 @@ app.put('/employee/myData/:id', async (req, res) => {
     const dateEnd = vac.endDate.split('-').reverse().join('.');
     const updateHoliday = await Vacation.findById(id)
     const applyDate = date.split('-').reverse().join('.');
-    await updateHoliday.pendingHolidays.pop();
-    await updateHoliday.save();
-    await updateHoliday.pendingHolidays.push({ startDate: `${dateStart}`, endDate: `${dateEnd}`, days: `${vac.days}`, status: `${vac.status}`, applyDate: `${applyDate}` });
-    await updateHoliday.save();
-    const editedVac = await Notifications.findByIdAndUpdate(id, { username: `${updateHoliday.user}`, days: `${vac.days}` })
-    editedVac.save()
-    req.flash('success', 'Vloga za dopust je posodobljena.')
-    res.redirect('/employee/myData')
+    try {
+        await updateHoliday.pendingHolidays.pop();
+        await updateHoliday.save();
+        await updateHoliday.pendingHolidays.push({ startDate: `${dateStart}`, endDate: `${dateEnd}`, days: `${vac.days}`, status: `${vac.status}`, applyDate: `${applyDate}` });
+        await updateHoliday.save();
+        const editedVac = await Notifications.updateOne({ user_id: `${id}` }, { $set: { days: `${vac.days}` } })
+        let transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: "jolda.ermin@gmail.com",
+                pass: `${yoo}`,
+            },
+            tls: {
+                rejectUnauthorized: false,
+            }
+        });
+        
+        let mailOptions = {
+            from: "jolda.ermin@gmail.com",
+            to: "mb.providio@gmail.com",
+            subject: "EDIT DOPUST",
+            text: `Delavec ${user.user} je spremenil vlogo za dopust od ${dateStart} - ${dateEnd} dne - ${applyDate}.`,
+        };
+        
+        transporter.sendMail(mailOptions, function (err, success) {
+            if (err) {
+                console.log(err.message);
+            } else {
+                console.log("Email sended");
+            }
+        })
+        req.flash('success', 'Vloga za dopust je posodobljena.')
+        res.redirect('/employee/myData')
+        
+    } catch (err) { 
+        req.flash('error', `Error: ${err.message}`)
+        res.redirect('/employee/myData')
+    }
 })
 
 //? EMPLOYEE DELETE VACATION
@@ -215,7 +251,8 @@ app.post('/employee/myData/delete/:id', async (req, res) => {
     const { id } = req.params;
     const deleteId = req.body.deleteVacId;
     const updateHoliday = await Vacation.findById(id)
-    const deleteNot = await Notifications.deleteOne({ _id: id })
+    try {
+        const deleteNot = await Notifications.deleteOne({ _id: id })
     for (vacations of updateHoliday.pendingHolidays) {
         if (vacations.id == deleteId) {
             await updateHoliday.pendingHolidays.pop(vacations);
@@ -224,6 +261,11 @@ app.post('/employee/myData/delete/:id', async (req, res) => {
             res.redirect('/employee/myData')
         }
     }
+    } catch (err) { 
+        req.flash('error', `Error: ${err.message}. Vloga za dopust NI izbrisana!`)
+        res.redirect('/employee/myData')
+    }
+    
 
 })
 
