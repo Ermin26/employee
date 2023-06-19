@@ -200,6 +200,8 @@
                     </table>
                 </div>
 
+            <!-- VACATIONS -->
+
                 <div class="row">
                     <caption class="mb-2 mt-2">
                         <h2 class="mb-3">
@@ -221,6 +223,15 @@
                         </thead>
                         <% for(info of holidayInfo) {%>
                             <% for(userInfo of info.pendingHolidays) {%>
+                                <% let format=/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;%>
+                                <% let currentDate=new Date() %>
+                                <% let dateParts=[]; %>
+                                <% let dateString=userInfo.endDate.toString();%>
+                                <% let hasDot=dateString.includes('.');%>
+                                <% if(hasDot) {%>
+                                    <% dateParts=dateString.split('.');%>
+                                    <% secondDateFormat=new Date(dateParts[2],dateParts[1]-1,dateParts[0])%>
+                                    <% if(secondDateFormat > currentDate) {%>
                                 <tr id="myRow" class="">
                                     <td>
                                         <strong>
@@ -260,6 +271,7 @@
                                                     action="/employee/myData/delete/<%= user.id%>" method="post">
                                                     <input type="text" name="deleteVacId" id="deleteVacId" hidden
                                                         value="<%= userInfo.id%>">
+                                                        <%= userInfo.id %>
                                                     <button class="btn btn-danger btn-sm">Izbriši</button>
                                                 </form>
                                             </strong>
@@ -277,6 +289,69 @@
                                             <% } %>
                                 </tr>
                                 <% } %>
+                                    <% } %>
+                                    <% } %>
+                                    <% } %>
+                    </table>
+                </div>
+                <div class="row mt-5">
+                    <h3 class="text-center mt-5">Vse odane vloge</h3>
+                </div>
+                
+                <!-- HISTORY -->
+                
+                <div id="history" class="row mb-5">
+                    <table id="planiranDopust" class="table ms-auto me-auto mt-4 align-items-center">
+                        <thead id="planiranHead">
+                            <th>Prvi dan dopusta</th>
+                            <th>Zadnji dan dopusta</th>
+                            <th>Dni</th>
+                            <th>Datum</th>
+                            <th>Status</th>
+                        </thead>
+                        <% for(info of holidayInfo) {%>
+                            <% for(userInfo of info.pendingHolidays) {%>
+                                <% let format=/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;%>
+                                <% let currentDate=new Date() %>
+                                <% let dateParts=[]; %>
+                                <% let dateString=userInfo.endDate.toString();%>
+                                <% let hasDot=dateString.includes('.');%>
+                                <% if(hasDot) {%>
+                                    <% dateParts=dateString.split('.');%>
+                                    <% secondDateFormat=new Date(dateParts[2],dateParts[1]-1,dateParts[0])%>
+                                    <% if(secondDateFormat < currentDate) {%>
+                                <tr id="myRow" class="">
+                                    <td>
+                                        <strong>
+                                            <%= userInfo.startDate%>
+                                        </strong>
+                                    </td>
+                                    <td>
+                                        <strong>
+                                            <%= userInfo.endDate%>
+                                        </strong>
+                                    </td>
+                                    <td>
+                                        <strong>
+                                            <%= userInfo.days%>
+                                        </strong>
+                                    </td>
+                                    <td id="status" class="">
+                                        <strong>
+                                            <%= userInfo.applyDate%>
+                                        
+                                        </strong>
+                                    </td>
+                                    <td>
+                                        <strong>
+                                            <%= userInfo.status%>
+                                        </strong>
+                                    </td>
+                                   
+                                </tr>
+                                <% } %>
+                                    <% } %>
+                                    <% } %>
                                     <% } %>
                     </table>
                 </div>

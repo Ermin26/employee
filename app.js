@@ -279,22 +279,18 @@ app.post('/employee/myData/delete/:id', async (req, res) => {
     const { id } = req.params;
     const deleteId = req.body.deleteVacId;
     const updateHoliday = await Vacation.findById(id)
+    
     try {
-        const deleteNot = await Notifications.deleteOne({ vac_id: deleteId })
-    for (vacations of updateHoliday.pendingHolidays) {
-        if (vacations.id == deleteId) {
-            await updateHoliday.pendingHolidays.pop(vacations);
-            await updateHoliday.save();
-            req.flash('success', 'Vloga za dopust izbrisana.')
-            res.redirect('/employee/myData')
-        }
-    }
+        
+        await Notifications.deleteOne({ vac_id: deleteId })
+        await updateHoliday.pendingHolidays.pull({ _id: deleteId })
+        updateHoliday.save()
+        req.flash('success', 'Vloga za dopust izbrisana.')
+        res.redirect('/employee/myData')
     } catch (err) { 
         req.flash('error', `Error: ${err.message}. Vloga za dopust NI izbrisana!`)
         res.redirect('/employee/myData')
     }
-    
-
 })
 
 app.get('/logMeOut', (req, res, next) => {
