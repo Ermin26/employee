@@ -126,7 +126,6 @@ app.get('/employee/myData', isLoged, async (req, res) => {
     } else {
         const findedEmployee = await User.find({ buyer: { $regex: `${req.user.username}`, $options: 'i' }, pay: 'false' })
         const holidayInfo = await Vacation.find({ user: { $regex: `${req.user.username}`, $options: 'i' } })
-       
         res.render('userCheckByHimself', { findedEmployee, holidayInfo, year })
     }
 })
