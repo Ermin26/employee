@@ -293,11 +293,41 @@
                                     <% } %>
                     </table>
                 </div>
+
+
+                <div id="ure" class="row w-100 mt-5">
+                    <h3 class="text-center mt-5">Poraba ur</h3>
+                    <table class="table table-primary ms-auto me-auto align-items-center">
+                        <thead>
+                            <tr>
+                            <th>Datum</th>
+                            <th>Dnevi</th>
+                            <th>Ure</th>
+                            <th>Uredi</th>
+                            <th>Izbriši</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <% for(data of holidayInfo) {%>
+                            <% for(hours of data.hours) {%>
+                                <tr>
+                                <td class="align-middle"><%= hours.date %></td>
+                                <td class="align-middle"><%= hours.days %></td>
+                                <td class="align-middle"><%= hours.hours %></td>
+                                <td class="align-middle"><button class="btn btn-warning">Uredi</button></td>
+                                <td class="align-middle"><button class="btn btn-danger">Izbriši</button></td>
+                            </tr>
+                            <% } %>
+                        <% } %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- HISTORY -->
                 <div class="row mt-5">
                     <h3 class="text-center mt-5">Vse odane vloge</h3>
                 </div>
                 
-                <!-- HISTORY -->
                 
                 <div id="history" class="row mb-5">
                     <table id="planiranDopust" class="table ms-auto me-auto mt-4 align-items-center">

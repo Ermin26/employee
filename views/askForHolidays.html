@@ -95,7 +95,7 @@
                     </div>
                 </caption>
                 <div class="ure mt-5 mb-5 text-light d-flex justify-content-center text-center">
-                    <form action="/useOvertim" method="post">
+                    <form action="/useOvertime" method="post">
                         <input type="text" name="userid" value="<%= usersData.id %>" hidden>
                         <div class="mb-2 d-flex flex-column">
                             <label for="startDate">Izaberi datum</label>
@@ -113,10 +113,6 @@
                         <button class="btn btn-sm btn-primary mt-2" onclick="checkHrs()">Potrdi</button>
                     </form>
                 </div>
-                <div id="hrs">
-                    <input id="hrsValue" type="text" value="<%= usersData.overtime %>">
-                </div>
-                <button onclick="btn()">click</button>
             </div>
     </div>
 
@@ -125,15 +121,6 @@
     <script>
         document.getElementById('dopust').style.display = 'none';
         document.getElementById('ure').style.display = 'none';
-        document.getElementById('hrs').style.display = 'none';
-        function btn() {
-            let maxHrs = document.getElementById('hrsValue').value;
-            let hrs = document.getElementById('overtime').value;
-            let dni = document.getElementById('dni').value;
-            let skupaj = parseFloat(hrs) * parseFloat(dni);
-            console.log(skupaj == maxHrs);
-            console.log(hrs, 'hrs');
-        }
 
         function dopust() {
             document.getElementById('dopust').style.display = 'block';
@@ -149,7 +136,7 @@
             document.getElementById('dopustFunction').style.display = 'block';
             document.getElementById('ure').style.display = 'block';
             document.getElementById('ureFunction').style.display = 'none';
-        }   
+        }
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"

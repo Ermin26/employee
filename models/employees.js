@@ -7,6 +7,7 @@ const EmployersSchema = new Schema({
     username: String,
     password: String,
     lastname: String,
+    email: String,
     employmentStatus: {
         type: String,
         enum: ['študent', 'zaposlen/a', 'upokojenec']
@@ -16,6 +17,7 @@ const EmployersSchema = new Schema({
         enum: ['active', 'inactive']
     }
 });
+
 
 EmployersSchema.plugin(passportLocalMongoose);
 

@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+const HoursShema = new Schema({
+    date: String,
+    days: Number,
+    hours: String
+});
+
 const PendingSchema = new Schema({
     startDate: [{
         type: String
@@ -29,7 +35,8 @@ const VacationSchema = new Schema({
         type: String,
         default: 0,
     },
-    pendingHolidays: [PendingSchema]
+    pendingHolidays: [PendingSchema],
+    hours: [HoursShema]
 })
 
 

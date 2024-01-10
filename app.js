@@ -20,6 +20,7 @@ const cookieParser = require('cookie-parser')
 const Employers = require('./models/employees');
 const User = require('./models/models')
 const Notifications = require('./models/notifications')
+const HoursNotifications = require('./models/hours')
 const { isLoged } = require('./midleware/loged');
 const nodemailer = require('nodemailer');
 
@@ -162,14 +163,14 @@ app.post('/askForHoliday', async (req, res) => {
                         rejectUnauthorized: false,
                     }
                 });
-                
+
                 let mailOptions = {
                     from: "jolda.ermin@gmail.com",
                     to: "mb.providio@gmail.com",
                     subject: "DOPUST",
                     text: `Delavec ${user.user} je odal vlogo za dopust od ${dateStart} - ${dateEnd} dne - ${applyDate}.`,
                 };
-                
+
                 transporter.sendMail(mailOptions, function (err, success) {
                     if (err) {
                         console.log(err.message);
@@ -189,9 +190,56 @@ app.post('/askForHoliday', async (req, res) => {
         req.flash('error', `Error: ${e.message}. Oddaja vloge za dopust ni uspela!`);
         res.redirect('/employee/askForHolidays');
     }
-    
 })
+app.post('/useOvertime', async (req, res) => {
+    const data = req.body;
+    const dateStart = data.startDate.split('-').reverse().join('.');
+    const user = await Vacation.findById(data.userid);
+    try{
+        user.hours.push({date: `${dateStart}`, days: `${data.dni}`, hours: `${data.overtime}`});
+        await user.save(async function (err, result){
+            if(err) {
+                req.flash('error', `Error: ${err.message}`)
+                res.redirect('/employee/askForHolidays')
+            } else{
+                let transporter = nodemailer.createTransport({
+                    service: "gmail",
+                    auth: {
+                        user: "jolda.ermin@gmail.com",
+                        pass: `${yoo}`,
+                    },
+                    tls: {
+                        rejectUnauthorized: false,
+                    }
+                });
 
+                let mailOptions = {
+                    from: "jolda.ermin@gmail.com",
+                    to: "mb.providio@gmail.com",
+                    subject: "DOPUST",
+                    text: `Delavec ${user.user} je odal vlogo za korištenje ur od ${dateStart}, ${data.dni} ur.`,
+                };
+
+                transporter.sendMail(mailOptions, function (err, success) {
+                    if (err) {
+                        console.log(err.message);
+                    } else {
+                        console.log("Email sended");
+                    }
+                })
+                const overtime = result.hours[result.hours.length - 1];
+                const hoursNotif = await new HoursNotifications({username: `${user.user}`, user_id: `${user.id}`, hours_id: `${overtime._id}`, startDate: `${dateStart}`, hours: `${data.overtime}`})
+                await hoursNotif.save();
+            }
+        })
+
+        res.redirect('/employee/myData');
+    }catch (e) {
+        console.error("This is error for hours: ", e.message);
+        req.flash('error', "Error: ", e.message)
+        res.redirect('/employee/askForHolidays');
+    }
+})
 app.get('/employee/myData/:id', async (req, res) => {
     const { id } = req.params;
     const userHoliday = await Vacation.find({ user: { $regex: `${req.user.username}`, $options: 'i' } })
@@ -216,11 +264,11 @@ app.put('/employee/myData/:id', async (req, res) => {
     const updateHoliday = await Vacation.findById(id)
     const applyDate = date.split('-').reverse().join('.');
     try {
-        
+
         for (let i = 0; i < updateHoliday.pendingHolidays.length; i++) {
-            
+
             if (vac.vacId === updateHoliday.pendingHolidays[i].id) {
-                
+
                 await updateHoliday.pendingHolidays[i].startDate.pop();
                 await updateHoliday.pendingHolidays[i].endDate.pop();
                 await updateHoliday.pendingHolidays[i].days.pop();

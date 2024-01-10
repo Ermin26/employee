@@ -2,17 +2,17 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const passportLocalMongoose = require('passport-local-mongoose');
 
-
-const NotificationsSchema = new Schema({
+const HoursNotificationsSchema = new Schema({
     username: String,
     user_id: String,
-    vac_id: String,
-    days: Number,
-    status: {
+    hours_id: String,
+    startDate: String,
+    hours: Number,
+    status:{
         type: String,
         default: 'false',
-        enum: ['false', 'true']
     }
 });
 
-module.exports = mongoose.model('Notifications', NotificationsSchema)
+
+module.exports = mongoose.model('HoursNotifications', HoursNotificationsSchema)
