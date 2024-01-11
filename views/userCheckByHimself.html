@@ -143,12 +143,12 @@
                         <thead id="stanjeHead">
                             <th>Lanski dopust</th>
                             <th>Letni dopust</th>
-                            <th>Skupaj za tekoče leto</th>
+                            <th>Skupaj</th>
                             <th>Koriščeno</th>
                             <th>Preostalo</th>
                             <th>Ure</th>
                             <th>Koriščeno</th>
-                            <th>Preostale ure</th>
+                            <th>Skupaj ure</th>
                         </thead>
                         <tbody>
                             <% for(user of holidayInfo) {%>
@@ -213,8 +213,8 @@
                 <div id="planiran" class="row">
                     <table id="planiranDopust" class="table ms-auto me-auto mt-4 align-items-center">
                         <thead id="planiranHead">
-                            <th>Prvi dan dopusta</th>
-                            <th>Zadnji dan dopusta</th>
+                            <th>Prvi dan</th>
+                            <th>Zadnji dan</th>
                             <th>Dni</th>
                             <th>Status</th>
                             <th>Datum</th>
@@ -295,7 +295,7 @@
                 </div>
 
 
-                <div id="ure" class="row w-100 mt-5">
+                <div id="ure" class="row w-100 mt-5 ms-auto me-auto">
                     <h3 class="text-center mt-5">Poraba ur</h3>
                     <table class="table table-primary ms-auto me-auto align-items-center">
                         <thead>
@@ -303,6 +303,7 @@
                             <th>Datum</th>
                             <th>Dnevi</th>
                             <th>Ure</th>
+                            <th>Status</th>
                             <th>Uredi</th>
                             <th>Izbriši</th>
                         </tr>
@@ -311,11 +312,22 @@
                         <% for(data of holidayInfo) {%>
                             <% for(hours of data.hours) {%>
                                 <tr>
-                                <td class="align-middle"><%= hours.date %></td>
-                                <td class="align-middle"><%= hours.days %></td>
-                                <td class="align-middle"><%= hours.hours %></td>
-                                <td class="align-middle"><button class="btn btn-warning">Uredi</button></td>
-                                <td class="align-middle"><button class="btn btn-danger">Izbriši</button></td>
+                                <td class="align-middle"><strong><%= hours.date %></strong></td>
+                                <td class="align-middle"><strong><%= hours.days %></strong></td>
+                                <td class="align-middle"><strong><%= hours.hours %></strong></td>
+                                <td class="align-middle"><strong><%= hours.status %></strong></td>
+                                <td class="align-middle"><strong>
+                                    <a href="/overtime/edit/<%= hours.id%> "><button
+                                            class="btn btn-warning btn-sm">Uredi</button></a>
+                                </strong></td>
+                                <td class="align-middle"><strong>
+                                    <form class="d-inline ms-auto me-auto"
+                                        action="/overtime/delete/<%= user.id%>" method="post">
+                                        <input type="text" name="hours_id" id="hours_id" hidden
+                                            value="<%= hours.id%>">
+                                        <button class="btn btn-danger btn-sm">Izbriši</button>
+                                    </form>
+                                </strong></td>
                             </tr>
                             <% } %>
                         <% } %>
@@ -327,8 +339,7 @@
                 <div class="row mt-5">
                     <h3 class="text-center mt-5">Vse odane vloge</h3>
                 </div>
-                
-                
+
                 <div id="history" class="row mb-5">
                     <table id="planiranDopust" class="table ms-auto me-auto mt-4 align-items-center">
                         <thead id="planiranHead">

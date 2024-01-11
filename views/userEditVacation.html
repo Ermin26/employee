@@ -38,7 +38,7 @@
     </nav>
     <div class="container">
         <%# include('../../flashError') %>
-
+        <% if(!hourses) {%>
             <div class="holiday text-center">
                 <h1>Uredi dopust</h1>
             </div>
@@ -69,7 +69,27 @@
 
                 </form>
             </div>
+        <% }else if(!holiday){%>
+            <div class="ure mt-5 mb-5 text-dark d-flex justify-content-center text-center">
+                <form action="/overtime/edit/<%= hourses.id %>?_method=PUT" method="post">
+                    <input type="text" name="hours_id" value="<%= hours.id %>" hidden>
+                    <div class="mb-2 d-flex flex-column">
+                        <label for="startDate">Izaberi datum</label>
+                        <input type="date" class="text-center" name="startDate" id="startDate" value="<%= hours.date %>" required>
+                    </div>
+                    <div class="mb-2 d-flex flex-column">
+                        <label for="dni">Dnevi</label>
+                        <input type="number" class="text-center" name="dni" id="dni" value="<%= hours.days %>" required>
+                    </div>
+                    <div class="mb-2 d-flex flex-column">
+                        <label for="overtime">Ur</label>
+                        <input type="text" class="text-center" name="overtime" id="overtime" min="1" value="<%= hours.hours %>" required>
+                    </div>
+                    <button class="btn btn-sm btn-primary mt-2">Potrdi</button>
+                </form>
+            </div>
 
+        <% } %>
     </div>
 
     </div>
