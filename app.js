@@ -132,12 +132,12 @@ app.get('/employee/myData', isLoged, async (req, res) => {
 })
 
 app.get('/employee/askForHolidays', isLoged, async (req, res) => {
-
     const user = await Vacation.find({ user: { $regex: `${req.user.username}`, $options: 'i' } });
     for (data of user) {
         let usersData = data
-        res.render('askForHolidays', { usersData })
     }
+    const usersData = user[0];
+    res.render('askForHolidays', { usersData })
 })
 
 app.post('/askForHoliday', async (req, res) => {
