@@ -211,7 +211,7 @@
                 </div>
 
                 <div id="planiran" class="row">
-                    <table id="planiranDopust" class="table ms-auto me-auto mt-4 align-items-center">
+                    <table id="planiranDopust" class="table table-bordered border-dark ms-auto me-auto mt-4 align-items-center">
                         <thead id="planiranHead">
                             <th>Prvi dan</th>
                             <th>Zadnji dan</th>
@@ -297,7 +297,7 @@
 
                 <div id="ure" class="row w-100 mt-5 ms-auto me-auto">
                     <h3 class="text-center mt-5">Poraba ur</h3>
-                    <table class="table table-primary ms-auto me-auto align-items-center">
+                    <table id="planiraneUre" class="table table-bordered border-dark ms-auto me-auto align-items-center">
                         <thead>
                             <tr>
                             <th>Datum</th>
@@ -433,8 +433,6 @@
         const vlogaDopust = document.getElementById('planiranDopust');
         const planiranRows = vlogaDopust.rows.length - 1;
         if (planiranRows > 0) {
-            let approved = 'Approved';
-            let rejected = 'Rejected';
             for (let i = 1; i <= planiranRows; i++) {
                 var status = document.getElementById('planiranDopust').rows[i].cells[3].innerText;
                 if (status == 'Approved') {
@@ -442,13 +440,34 @@
                 }
                 if (status == 'Rejected') {
                     document.getElementById('planiranDopust').rows[i].setAttribute('class', 'bg-danger')
-                    //console.log(status)
+                }
+                else{
+                    document.getElementById('planiranDopust').rows[i].setAttribute('class', 'bg-info')
 
                 }
+
             }
 
         }
 
+        const hours = document.getElementById('planiraneUre');
+        const rowsOfHours = hours.rows.length - 1;
+
+        if(rowsOfHours > 0){
+
+            for(let i = 1; i <= rowsOfHours; i++){
+                var status = document.getElementById('planiraneUre').rows[i].cells[3].innerText;
+                if (status == 'Approved') {
+                    document.getElementById('planiraneUre').rows[i].setAttribute('class', 'bg-success')
+                }
+                if (status == 'Rejected') {
+                    document.getElementById('planiraneUre').rows[i].setAttribute('class', 'bg-danger')
+                }
+                else{
+                    document.getElementById('planiraneUre').rows[i].setAttribute('class', 'bg-info')
+                }
+            }
+        }
 
     </script>
 
