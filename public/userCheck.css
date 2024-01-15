@@ -8,10 +8,24 @@ body {
     overflow-y: auto;
 }
 .container{
-    
     overflow-x: hidden;
 }
+#table, #stanje, #planiran, #ure, #history {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    overflow-x: auto;
+    width: 100%;
+}
+#history{
+    max-height: 80vh;
+}
 
+#table-info, #stanjeLetnegaDopusta, #planiranDopust, #planiraneUre,#historyDopust {   
+    padding: 0px;
+    overflow-x: auto;
+    width: 100%;
+}
 
 @media (max-width: 550px) {
     body {
@@ -19,16 +33,19 @@ body {
         height: 100%;
     }
 
-    #table, #stanje, #planiran {
+    #table, #stanje, #planiran, #ure, #history {
         margin: 0;
         padding: 0;
         display: flex;
         overflow-x: auto;
         width: 100%;
-
     }
 
-    #table-info, #stanjeLetnegaDopusta, #planiranDopust {   
+    #history{
+        height: 50vh;
+    }
+
+    #table-info, #stanjeLetnegaDopusta, #planiranDopust, #planiraneUre, #historyDopust {   
         padding: 0px;
         overflow-x: auto;
         width: 100%;
