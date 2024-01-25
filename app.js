@@ -168,7 +168,7 @@ app.post('/askForHoliday', async (req, res) => {
                     from: "jolda.ermin@gmail.com",
                     to: "mb.providio@gmail.com",
                     subject: "DOPUST",
-                    text: `Delavec ${user.user} je odal vlogo za dopust od ${dateStart} - ${dateEnd} dne - ${applyDate}.`,
+                    text: `Delavec ${user.user} je odal vlogo za dopust od ${dateStart} - ${dateEnd} dne - ${applyDate}. https://izdaja-blaga.onrender.com/vacation`,
                 };
 
                 transporter.sendMail(mailOptions, function (err, success) {
@@ -217,7 +217,7 @@ app.post('/useOvertime', async (req, res) => {
                     from: "jolda.ermin@gmail.com",
                     to: "mb.providio@gmail.com",
                     subject: "DOPUST",
-                    text: `Delavec ${user.user} je odal vlogo za korištenje ur od ${dateStart}, ${data.dni} ur.`,
+                    text: `Delavec ${user.user} je odal vlogo za korištenje ur od ${dateStart}, ${data.dni} ur. https://izdaja-blaga.onrender.com/vacation`,
                 };
 
                 transporter.sendMail(mailOptions, function (err, success) {
