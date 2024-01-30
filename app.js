@@ -166,7 +166,7 @@ app.post('/askForHoliday', async (req, res) => {
 
                 let mailOptions = {
                     from: "jolda.ermin@gmail.com",
-                    to: "mb.providio@gmail.com",
+                    to: "mb.providio@gmail.com, rataj.tvprodaja@gmail.com",
                     subject: "DOPUST",
                     text: `Delavec ${user.user} je odal vlogo za dopust od ${dateStart} - ${dateEnd} dne - ${applyDate}. https://izdaja-blaga.onrender.com/vacation`,
                 };
